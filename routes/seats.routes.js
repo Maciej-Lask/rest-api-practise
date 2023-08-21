@@ -26,6 +26,16 @@ router.post('/', (req, res) => {
     return;
   }
 
+  const isSeatTaken = db.seats.some(
+    (item) => item.day === day && item.seat === seat
+  );
+
+  
+  if (isSeatTaken) {
+    res.status(400).json({ message: 'The slot is already taken on this day' });
+    return;
+  }
+  
   const newSeat = {
     id: shortid.generate(),
     day,
@@ -85,7 +95,7 @@ router.delete('/:id', (req, res) => {
   }
 
   db.seats.splice(seatIndex, 1);
-  res.status(204).send(); 
+  res.status(204).send();
 });
 
 module.exports = router;
