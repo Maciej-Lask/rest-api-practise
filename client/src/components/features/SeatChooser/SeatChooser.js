@@ -13,27 +13,29 @@ const SeatChooser = ({ chosenDay, chosenSeat, updateSeat }) => {
   const seats = useSelector(getSeats);
   const requests = useSelector(getRequests);
 
-
-  useEffect(() => {
+  // Function to load seats and set an interval to reload every two minutes
+  const loadSeatsAndSetInterval = () => {
     dispatch(loadSeatsRequest());
+  };
 
-    if (chosenSeat && chosenDay) {
-      dispatch(loadSeatsRequest());
-    }
-  }, [dispatch, chosenDay, chosenSeat]);
-
-  const [isReserving, setIsReserving] = useState(false);
   useEffect(() => {
-    if (isReserving) {
-      const intervalId = setInterval(() => {
-        dispatch(loadSeatsRequest());
-      }, 120000); 
+    loadSeatsAndSetInterval(); // Initial load of seats
 
-      return () => {
-        clearInterval(intervalId);
-      };
+    // Load seats again if chosenSeat and chosenDay change
+    if (chosenSeat && chosenDay) {
+      loadSeatsAndSetInterval();
     }
-  }, [isReserving, dispatch]);
+    // Set an interval to load seats every two minutes (120,000 milliseconds)
+    const intervalId = setInterval(() => {
+      loadSeatsAndSetInterval();
+    }, 120000);
+
+    // Cleanup function to clear the interval when the component unmounts
+    return () => {
+      clearInterval(intervalId);
+    };
+
+  }, [dispatch, chosenDay, chosenSeat]);
 
   const isTaken = (seatId) => {
     return seats.some((item) => item.seat === seatId && item.day === chosenDay);
