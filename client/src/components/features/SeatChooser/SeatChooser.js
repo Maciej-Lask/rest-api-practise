@@ -3,39 +3,46 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Button, Progress, Alert } from 'reactstrap';
 import {
   getSeats,
+  loadSeats,
   loadSeatsRequest,
   getRequests,
 } from '../../../redux/seatsRedux';
 import './SeatChooser.scss';
+import io from 'socket.io-client';
 
 const SeatChooser = ({ chosenDay, chosenSeat, updateSeat }) => {
   const dispatch = useDispatch();
   const seats = useSelector(getSeats);
   const requests = useSelector(getRequests);
-
-  // Function to load seats and set an interval to reload every two minutes
-  const loadSeatsAndSetInterval = () => {
-    dispatch(loadSeatsRequest());
-  };
+  const [freeSeatsCount, setFreeSeatsCount] = useState(0);
+  const [socket, setSocket] = useState();
+  const totalSeatsCount = 50; 
 
   useEffect(() => {
-    loadSeatsAndSetInterval(); // Initial load of seats
+    dispatch(loadSeatsRequest());
+    const socket = io(
+      process.env.NODE_ENV === 'production' ? '' : 'ws://localhost:8000',
+      { transports: ['websocket'] }
+    );
+    setSocket(socket);
 
-    // Load seats again if chosenSeat and chosenDay change
-    if (chosenSeat && chosenDay) {
-      loadSeatsAndSetInterval();
-    }
-    // Set an interval to load seats every two minutes (120,000 milliseconds)
-    const intervalId = setInterval(() => {
-      loadSeatsAndSetInterval();
-    }, 120000);
+    socket.on('seatsUpdated', (seats) => {
+      dispatch(loadSeats(seats));
+    });
 
-    // Cleanup function to clear the interval when the component unmounts
     return () => {
-      clearInterval(intervalId);
+      socket.disconnect();
     };
+  }, []);
 
-  }, [dispatch, chosenDay, chosenSeat]);
+  useEffect(() => {
+    const takenSeatsCount = seats.filter(
+      (item) => item.day === chosenDay
+    ).length;
+    
+    const freeSeats = totalSeatsCount - takenSeatsCount;
+    setFreeSeatsCount(freeSeats);
+  }, [seats, chosenDay]);
 
   const isTaken = (seatId) => {
     return seats.some((item) => item.seat === seatId && item.day === chosenDay);
@@ -88,6 +95,9 @@ const SeatChooser = ({ chosenDay, chosenSeat, updateSeat }) => {
       {requests['LOAD_SEATS'] && requests['LOAD_SEATS'].error && (
         <Alert color="warning">Couldn't load seats...</Alert>
       )}
+      <p>
+        Free seats: {freeSeatsCount}/{totalSeatsCount}
+      </p>
     </div>
   );
 };

@@ -35,6 +35,8 @@ router.post('/', (req, res) => {
     res.status(400).json({ message: 'The slot is already taken on this day' });
     return;
   }
+
+
   
   const newSeat = {
     id: shortid.generate(),
@@ -45,6 +47,9 @@ router.post('/', (req, res) => {
   };
 
   db.seats.push(newSeat);
+  // emit a seatsUpdated event
+  req.io.emit('seatsUpdated', db.seats);
+  console.log("Seats updated");
   res.status(201).json(newSeat);
 });
 
