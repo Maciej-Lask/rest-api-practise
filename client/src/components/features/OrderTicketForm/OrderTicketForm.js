@@ -20,7 +20,6 @@ import SeatChooser from './../SeatChooser/SeatChooser';
 const OrderTicketForm = () => {
   const dispatch = useDispatch();
   const requests = useSelector(getRequests);
-  console.log(requests);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
 
   const [order, setOrder] = useState({
@@ -63,8 +62,8 @@ const OrderTicketForm = () => {
           day: 1,
           seat: '',
         });
-        setIsError(false);
         dispatch(loadSeatsRequest());
+        setIsError(false);
       } catch (error) {
         console.error(error);
         setIsError(true);

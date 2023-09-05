@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
 const socket = require('socket.io');
+const mongoose = require('mongoose');
 const app = express();
 const cors = require('cors');
 
@@ -9,10 +10,22 @@ const concertsRouter = require('./routes/concerts.routes');
 const seatsRouter = require('./routes/seats.routes');
 
 app.use(cors());
-
 //  app.use(express.static(path.join(__dirname, '/public')));
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
+
+
+mongoose.connect('mongodb://localhost:27017/NewWaveDB', {
+  useNewUrlParser: true,
+  // useUnifiedTopology: true,
+  // useCreateIndex: true,
+});
+const db = mongoose.connection;
+db.once('open', () => {
+  console.log('Connected to the database');
+});
+db.on('error', (err) => console.log('Error ' + err));
+
 
 app.use((req, res, next) => {
   req.io = io;
@@ -23,7 +36,6 @@ app.use('/api/testimonials', testimonialsRouter);
 app.use('/api/concerts', concertsRouter);
 app.use('/api/seats', seatsRouter);
 
-// Serve static files from the React app
 app.use(express.static(path.join(__dirname, '/client/build')));
 
 app.get('*', (req, res) => {

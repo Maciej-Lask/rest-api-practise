@@ -25,16 +25,19 @@ export const errorRequest = payload => ({ payload, type: ERROR_REQUEST });
 export const loadSeats = payload => ({ payload, type: LOAD_SEATS });
 export const addSeat = payload => ({ payload, type: ADD_SEAT });
 
+
+
 /* THUNKS */
 
 export const loadSeatsRequest = () => {
   return async dispatch => {
-
+    
     dispatch(startRequest({ name: 'LOAD_SEATS' }));
     try {
 
       let res = await axios.get(`${API_URL}/seats`);
       // await new Promise((resolve) => setTimeout(resolve, 2000));
+      // console.log(res);
       dispatch(loadSeats(res.data));
       dispatch(endRequest({ name: 'LOAD_SEATS' }));
 
@@ -55,7 +58,7 @@ export const addSeatRequest = (seat) => {
       // await new Promise((resolve) => setTimeout(resolve, 1000));
       dispatch(addSeat(res));
       dispatch(endRequest({ name: 'ADD_SEAT' }));
-
+      
     } catch(e) {
       dispatch(errorRequest({ name: 'ADD_SEAT', error: e.message }));
     }
@@ -75,7 +78,12 @@ const initialState = {
 export default function reducer(statePart = initialState, action = {}) {
   switch (action.type) {
     case LOAD_SEATS: 
-      return { ...statePart, data: [...action.payload] };
+    {
+      // console.log(action);
+      const payloadArray = Array.isArray(action.payload) ? action.payload : [];
+      return { ...statePart, data: [...payloadArray] };
+      // return { ...statePart, data: [...action.payload] };
+    }
     case ADD_SEAT: 
       return { ...statePart, data: [...statePart.data, action.payload] }
     case START_REQUEST:
