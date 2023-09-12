@@ -79,7 +79,7 @@ export default function reducer(statePart = initialState, action = {}) {
   switch (action.type) {
     case LOAD_SEATS: 
     {
-      // console.log(action);
+      console.log(action);
       const payloadArray = Array.isArray(action.payload) ? action.payload : [];
       return { ...statePart, data: [...payloadArray] };
       // return { ...statePart, data: [...action.payload] };

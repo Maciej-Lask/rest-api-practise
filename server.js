@@ -43,7 +43,7 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '/client/build/index.html'));
 });
 
-app.use((req, res) => {
+app.use((req, res) => { 
   res.status(404).json({ error: 'Route not found' });
 });
 
@@ -56,3 +56,5 @@ const io = socket(server);
 io.on('connection', (socket) => {
   console.log('New socket connection! Its id – ' + socket.id);
 });
+
+module.exports = server;

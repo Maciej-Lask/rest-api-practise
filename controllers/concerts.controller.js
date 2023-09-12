@@ -95,3 +95,48 @@ exports.deleteConcert = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+exports.getConcertsByPerformer = async (req, res) => {
+  const performer = req.params.performer;
+  try {
+    const concerts = await Concert.find({ performer });
+    res.json(concerts);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+exports.getConcertsByGenre = async (req, res) => {
+  const genre = req.params.genre;
+  try {
+    const concerts = await Concert.find({ genre });
+    res.json(concerts);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+exports.getConcertsByPriceRange = async (req, res) => {
+  const price_min = req.params.price_min;
+  const price_max = req.params.price_max;
+  try {
+    const concerts = await Concert.find({
+      price: { $gte: price_min, $lte: price_max },
+    });
+    res.json(concerts);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+exports.getConcertsByDay = async (req, res) => {
+  const day = req.params.day;
+  try {
+    const concerts = await Concert.find({ day });
+ 
+    res.json(concerts);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
