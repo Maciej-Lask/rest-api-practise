@@ -1,6 +1,6 @@
 const chai = require('chai');
 const chaiHttp = require('chai-http');
-const server = require('../../server'); 
+const server = require('../../server');
 const Concert = require('../concert.model');
 
 chai.use(chaiHttp);
@@ -26,16 +26,15 @@ describe('Concert API - GET', () => {
       price: 80,
       day: 3,
       image: 'image.jpg',
-    })
+    });
     await testConcert2.save();
   });
   after(async () => {
-    await Concert.deleteMany(); 
+    await Concert.deleteMany();
   });
-  
+
   // Test cases for GET endpoints
   describe('GET /api/concerts', () => {
-
     it('should return performer by performer name', async () => {
       const performerName = 'John Doe';
       const res = await request(server).get(
@@ -69,5 +68,4 @@ describe('Concert API - GET', () => {
       expect(res.body).to.be.an('array');
     });
   });
-
 });

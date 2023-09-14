@@ -1,4 +1,5 @@
 const Concert = require('../models/concert.model');
+const mongoSanitize = require('mongo-sanitize');
 
 exports.getAllConcerts = async (req, res) => {
   try {
@@ -26,13 +27,32 @@ exports.getConcertById = async (req, res) => {
 exports.createConcert = async (req, res) => {
   const { performer, genre, price, day, image } = req.body;
 
-  if (!performer || !genre || !price || !day || !image) {
+  // if (!performer || !genre || !price || !day || !image) {
+  //   res.status(400).json({ error: 'All fields are required' });
+  //   return;
+  // }
+  const sanitizedData = {
+    performer: mongoSanitize(performer),
+    genre: mongoSanitize(genre),
+    price: mongoSanitize(price),
+    day: mongoSanitize(day),
+    image: mongoSanitize(image),
+  };
+
+  if (
+    !sanitizedData.performer ||
+    !sanitizedData.genre ||
+    !sanitizedData.price ||
+    !sanitizedData.day ||
+    !sanitizedData.image
+  ) {
     res.status(400).json({ error: 'All fields are required' });
     return;
   }
 
   try {
-    const newConcert = new Concert({ performer, genre, price, day, image });
+    // const newConcert = new Concert({ performer, genre, price, day, image });
+    const newConcert = new Concert(sanitizedData);
     await newConcert.save();
     res.status(201).json(newConcert);
   } catch (err) {
@@ -133,10 +153,9 @@ exports.getConcertsByDay = async (req, res) => {
   const day = req.params.day;
   try {
     const concerts = await Concert.find({ day });
- 
+
     res.json(concerts);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
-

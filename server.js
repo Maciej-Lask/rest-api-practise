@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const socket = require('socket.io');
 const mongoose = require('mongoose');
+const helmet = require('helmet');
 const app = express();
 const cors = require('cors');
 
@@ -13,7 +14,17 @@ app.use(cors());
 //  app.use(express.static(path.join(__dirname, '/public')));
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
+app.use(helmet());
 
+// Na replit jest tak
+// const DB_PASS = process.env['DB_PASS'];
+
+// mongoose.connect(
+//   `mongodb+srv://maciek30088:${DB_PASS}@cluster0.ofdksez.mongodb.net/?retryWrites=true&w=majority`,
+//   {
+//     useNewUrlParser: true,
+//   }
+// );
 mongoose.connect(
   'mongodb+srv://maciek30088:Elitarny123@cluster0.ofdksez.mongodb.net/?retryWrites=true&w=majority',
   {
